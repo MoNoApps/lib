@@ -1,5 +1,5 @@
-const MoNoApps = {
-  DB: class DB {
+(($M) => {
+  $M.DB = class DB {
     constructor() {
       this.token = window.localStorage.getItem('token');
     }
@@ -8,4 +8,5 @@ const MoNoApps = {
       return this.token;
     }
   }
-}
+})(MoNoApps = {});
+
