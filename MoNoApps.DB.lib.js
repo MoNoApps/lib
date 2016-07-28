@@ -1,4 +1,4 @@
-(($) => {
+($ => {
   class DB {
     constructor() {
       this.token = window.localStorage.getItem('token');
