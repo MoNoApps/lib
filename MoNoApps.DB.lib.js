@@ -1,5 +1,5 @@
-(($M) => {
-  $M.DB = class DB {
+(($) => {
+  class DB {
     constructor() {
       this.token = window.localStorage.getItem('token');
     }
@@ -8,4 +8,6 @@
       return this.token;
     }
   }
+  
+  $['DB'] = DB
 })(MoNoApps = {});
