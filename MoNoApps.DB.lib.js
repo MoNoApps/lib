@@ -10,4 +10,4 @@
   }
   
   $['DB'] = DB
-})(MoNoApps || MoNoApps = {});
+})(MoNoApps);
