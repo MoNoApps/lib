@@ -1,17 +1,24 @@
 (($M) => {
-  const GameDeps = [
+  const Dependencies = [
     '$http',
     '$interval',
     '$log',
-    '$timeout'];
+    '$timeout',
+    'Messenger'];
 
   class Game {
     constructor(
       $http,
       $interval,
       $log,
-      $timeout
+      $timeout,
+      Messenger
     ) {
+      this.http = $http;
+      this.interval = $interval;
+      this.log = $log;
+      this.timeout = $timeout;
+      this.messenger = Messenger;
       this.peer = [];
       this.icons = [];
       this.board = [];
@@ -33,17 +40,17 @@
       this.chapter = 'game';
       this.status = 'active';
       this.tapeCode = 9641;
-      console.log(this);
+      this.log.log(this);
     }
 
     onInit() {
-      this.socket.on('info', this.info);
-      this.socket.on('join', this.join)
-      this.socket.on('level', this.leave);
-      this.socket.on('levels', this.onLevels);
-      this.socket.on('challenges', this.onChallenges);
+      this.messenger.on('info', this.onInfo.bind(this));
+      this.messenger.on('join', this.onJoin.bind(this))
+      this.messenger.on('level', this.onLevel.bind(this));
+      this.messenger.on('levels', this.onLevels.bind(this));
+      this.messenger.on('challenges', this.onChallenges.bind(this));
       if (this.token) {
-        this.socket.emit('identify', this.token);
+        this.messenger.emit('identify', this.token);
       }
     }
 
@@ -57,7 +64,7 @@
           this.isPaused = false;
           this.time = 60;
           this.status = 'warning';
-          this.socket.emit('play', {
+          this.messenger.emit('play', {
             challenge: angular.copy(this.challenge),
             level: angular.copy(this.level)
           });
@@ -78,7 +85,7 @@
         case 'done':
           this.gems += 1;
           this.level += 1;
-          this.socket.emit('done', {
+          this.messenger.emit('done', {
             challenge: angular.copy(this.challenge),
             time: angular.copy(this.time),
             board: angular.copy(this.board),
@@ -101,63 +108,63 @@
     }
 
     setChallenge(challenge) {
-      this.scope.act('stop');
-      this.scope.challenge = challenge;
-      this.socket.emit('anchor', { id: challenge._id });
+      this.act('stop');
+      this.challenge = challenge;
+      this.messenger.emit('anchor', { id: challenge._id });
     }
 
     attempt(idx) {
       addOne(idx);
 
-      if (this.scope.peer.length == 2) {
-        this.scope.tries++;
+      if (this.peer.length == 2) {
+        this.tries++;
 
-        if (this.scope.peer[0].c == this.scope.peer[1].c) {
-          this.scope.board[this.scope.peerIdx[0]].s = 'done';
-          this.scope.board[this.scope.peerIdx[1]].s = 'done';
+        if (this.peer[0].c == this.peer[1].c) {
+          this.board[this.peerIdx[0]].s = 'done';
+          this.board[this.peerIdx[1]].s = 'done';
           checkIsDone();
         } else {
-          this.scope.board[this.scope.peerIdx[0]].s = 0;
-          this.scope.board[this.scope.peerIdx[1]].s = 0;
-          this.scope.peer = [];
-          this.scope.peerIdx = [];
+          this.board[this.peerIdx[0]].s = 0;
+          this.board[this.peerIdx[1]].s = 0;
+          this.peer = [];
+          this.peerIdx = [];
         }
 
-        this.scope.reset();
+        this.reset();
       }
     }
 
     reset() {
-      this.scope.peer = [];
-      this.scope.peerIdx = [];
+      this.peer = [];
+      this.peerIdx = [];
     }
 
     setChapter(chapter) {
-      this.scope.chapter = chapter;
+      this.chapter = chapter;
     }
 
     addOne(idx) {
-      switch (this.scope.board[idx].s) {
+      switch (this.board[idx].s) {
         case 'done':
           break;
         case 'selected':
-          this.scope.board[this.scope.peerIdx[0]].s = 0;
-          this.scope.reset();
+          this.board[this.peerIdx[0]].s = 0;
+          this.reset();
           break;
         default:
-          this.scope.board[idx].s = 'selected';
-          this.scope.peer.push(this.scope.board[idx]);
-          this.scope.peerIdx.push(idx);
+          this.board[idx].s = 'selected';
+          this.peer.push(this.board[idx]);
+          this.peerIdx.push(idx);
           break;
       }
     }
 
     timer() {
-      checkForTimeInt = checkForTimeInt || $interval(function () {
-        if (this.scope.time > 0) {
-          this.scope.time -= 1;
+      checkForTimeInt = checkForTimeInt || $interval(() => {
+        if (this.time > 0) {
+          this.time -= 1;
         } else {
-          this.scope.act('stop');
+          this.act('stop');
           clearInterval(checkForTimeInt);
         }
       }, 1000);
@@ -181,41 +188,41 @@
 
     checkIsDone() {
       var done = true;
-      for (var idx in this.scope.board) {
-        if (this.scope.board[idx].s != 'done') {
+      for (var idx in this.board) {
+        if (this.board[idx].s != 'done') {
           done = false;
           break;
         }
       }
 
       if (done) {
-        this.scope.act('done');
+        this.act('done');
       }
     }
 
-    info(data) {
-      $timeout(() => {
+    onInfo(data) {
+      this.timeout(() => {
         if (data.gems) {
-          this.scope.gems = data.gems;
+          this.gems = data.gems;
         }
         if (data.scores) {
-          this.scope.scores = data.scores;
+          this.scores = data.scores;
         }
         if (data.activity) {
-          this.scope.activity = data.activity;
+          this.activity = data.activity;
         }
         if (data.completed) {
-          this.scope.completed = data.completed;
+          this.completed = data.completed;
         }
-      }, 1);
+      });
     }
 
     onJoin(data) {
-      $timeout(function () {
-        for (var i = 0; i < this.scope.challenges.length; i++) {
-          var ch = this.scope.challenges[i];
+      this.timeout(() => {
+        for (var i = 0; i < this.challenges.length; i++) {
+          var ch = this.challenges[i];
           if (ch._id === data.name) {
-            this.scope.challenges[i].users = data.size;
+            this.challenges[i].users = data.size;
             break;
           }
         }
@@ -223,29 +230,29 @@
     }
 
     onLevel(level) {
-      $timeout(function () {
+      this.timeout(() => {
         if (!level) {
-          this.scope.error = 'Level not found';
+          this.error = 'Level not found';
           return;
         }
 
-        this.scope.board = level.board;
-        this.scope.level = level.number;
+        this.board = level.board;
+        this.level = level.number;
         timer();
       }, 1);
     }
 
     onLevels(levels) {
-      this.scope.levels = levels;
+      this.levels = levels;
     }
 
     onChallenges(challenges) {
-      $timeout(function () {
-        this.scope.challenges = challenges;
+      this.timeout(() => {
+        this.challenges = challenges;
       }, 1);
     }
   }
 
-  $M.Core.Api.Game = GameDeps.concat(Game);
+  $M.Core.Api.Game = Dependencies.concat(Game);
 
-})(monoapps);
+})(MoNoApps);
