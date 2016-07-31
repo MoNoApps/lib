@@ -1,6 +1,17 @@
-($ => {
+(($M) => {
+  const GameDeps = [
+    '$http',
+    '$interval',
+    '$log',
+    '$timeout'];
+
   class Game {
-    constructor(scope, rootScope, http, interval, timeout) {
+    constructor(
+      $http,
+      $interval,
+      $log,
+      $timeout
+    ) {
       this.peer = [];
       this.icons = [];
       this.board = [];
@@ -22,6 +33,7 @@
       this.chapter = 'game';
       this.status = 'active';
       this.tapeCode = 9641;
+      console.log(this);
     }
 
     onInit() {
@@ -182,7 +194,7 @@
     }
 
     info(data) {
-      $timeout(function () {
+      $timeout(() => {
         if (data.gems) {
           this.scope.gems = data.gems;
         }
@@ -234,5 +246,6 @@
     }
   }
 
-  $.Game = Game;
-})(MoNoApps = {});
+  $M.Core.Api.Game = GameDeps.concat(Game);
+
+})(monoapps);
