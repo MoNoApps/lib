@@ -7,4 +7,4 @@
     .service('Messenger', $M.Core.Api.Messenger)
     .controller('Game', $M.Core.Api.Game)
     .controller('List', $M.Core.Api.List);
-})(angular.module, monoapps);
+})(angular.module, MoNoApps);
