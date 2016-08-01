@@ -1,4 +1,6 @@
-($ => {
+(($M) => {
+  const Dependencies = [];
+
   class DB {
     constructor() {
       this.token = window.localStorage.getItem('token');
@@ -9,5 +11,6 @@
     }
   }
   
-  $['DB'] = DB
+  $M.Core.Api.DB = Dependencies.concat(DB);
+
 })(MoNoApps);

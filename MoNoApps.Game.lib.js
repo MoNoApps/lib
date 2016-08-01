@@ -40,12 +40,11 @@
       this.chapter = 'game';
       this.status = 'active';
       this.tapeCode = 9641;
-      this.log.log(this);
     }
 
     onInit() {
       this.messenger.on('info', this.onInfo.bind(this));
-      this.messenger.on('join', this.onJoin.bind(this))
+      this.messenger.on('join', this.onJoin.bind(this));
       this.messenger.on('level', this.onLevel.bind(this));
       this.messenger.on('levels', this.onLevels.bind(this));
       this.messenger.on('challenges', this.onChallenges.bind(this));
@@ -226,7 +225,7 @@
             break;
           }
         }
-      }, 1);
+      });
     }
 
     onLevel(level) {
@@ -239,7 +238,7 @@
         this.board = level.board;
         this.level = level.number;
         timer();
-      }, 1);
+      });
     }
 
     onLevels(levels) {
@@ -249,7 +248,7 @@
     onChallenges(challenges) {
       this.timeout(() => {
         this.challenges = challenges;
-      }, 1);
+      });
     }
   }
 

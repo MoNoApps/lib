@@ -1,0 +1,30 @@
+{
+  "name": "lib",
+  "version": "1.0.0",
+  "description": "MoNoApps Library",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "*",
+    "gulp-concat": "*",
+    "gulp-jshint": "*",
+    "gulp-sourcemaps": "*",
+    "gulp-minify": "*",
+    "jshint": "*"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoNoApps/lib.git"
+  },
+  "author": "Daniel Martinez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MoNoApps/lib/issues"
+  },
+  "homepage": "https://github.com/MoNoApps/lib#readme"
+}
